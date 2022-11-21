@@ -1,0 +1,10 @@
+.venv
+.coverage
+.idea/
+.vscode/
+*__pycache__*
+*.sw*
+.python-version
+static/
+rest_framework/
+media/
