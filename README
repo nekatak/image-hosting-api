@@ -1,0 +1,50 @@
+Image hosting api
+-----------------
+Project Requirements
+1. Skip the registration part, assume users are created via the admin panel.
+2. Users should be able to do the following:
+a. Upload images via HTTP request
+b. List their images
+3. There are three account tiers – Basic, Premium and Enterprise.
+a. Users that have a "Basic" plan after uploading an image get:
+i. A link to a thumbnail that's 200px in height
+b. Users that have a "Premium" plan get:
+i. A link to a thumbnail that's 200px in height
+ii. A link to a thumbnail that's 400px in height
+iii. A link to the originally uploaded image
+c. Users that have an "Enterprise" plan get:
+i. A link to a thumbnail that's 200px in height
+ii. A link to a thumbnail that's 400px in height
+iii. A link to the originally uploaded image
+iv. Ability to fetch a link that expires after a number of seconds (user
+can specify any number between 300 and 30000)
+4. Admins should be able to create arbitrary plans with the following
+configurable attributes:
+a. Thumbnail sizes
+b. Presence of the link to the originally uploaded file
+c. Ability to generate expiring links
+5. Admin UI should be done via django-admin
+6. There should be NO custom user UI (just browsable API from DRF)
+7. Please keep the following in mind:
+a. Python 3.6 or above should be supported
+b. Ease of running the project (use of docker-compose is a plus)
+c. Tests
+d. Validation
+e. Performance considerations (assume there can be a lot of images and
+the API is frequently accessed)
+
+Development
+-----------
+
+Tested with python 3.10.
+
+All operations to run/execute the project are in the makefile.
+Running:
+```
+make setup database test createsuperuser static-files run-server
+```
+will start the server after running the unittests.
+
+Users to be created in the django-admin UI
+
+http://localhost:8000/admin (credentials `admin`:`123`)
