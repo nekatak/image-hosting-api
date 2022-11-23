@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime, timedelta
 
 import django.core.files
+from django.core.exceptions import ValidationError
 from django.db import models
 from PIL import Image as PILImage
 
@@ -12,6 +13,11 @@ from server import settings
 def image_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/<user_id>/<filename>
     return '{0}/{1}'.format(instance.user.id, filename)
+
+
+def validate_expiring_link_duration_seconds(value):
+    if value and 300 <= value <= 30000:
+        raise ValidationError('Invalid expiring_link_duration_seconds value')
 
 
 class Image(models.Model):
@@ -25,6 +31,10 @@ class Image(models.Model):
     parent_image = models.ForeignKey(
         'Image',
         on_delete=models.CASCADE,
+        null=True
+    )
+    expiring_link_duration_seconds = models.PositiveIntegerField(
+        validators=[validate_expiring_link_duration_seconds],
         null=True
     )
 
@@ -92,13 +102,15 @@ class Image(models.Model):
                 ln.save()
             if item.expiry_link:
                 unique_id = uuid.uuid4()
+                expiry_secs = (
+                    item.expiry_link_seconds or
+                    self.expiring_link_duration_seconds
+                )
                 ln = Link(
                     id=unique_id,
                     uri=f'{settings.BASE_URL}/api/images/links/{unique_id}',
                     image=obj,
-                    expiry=datetime.now() + timedelta(
-                        seconds=item.expiry_link_seconds
-                    ),
+                    expiry=datetime.now() + timedelta(seconds=expiry_secs),
                 )
                 ln.save()
 

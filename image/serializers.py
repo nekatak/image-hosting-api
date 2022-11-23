@@ -15,7 +15,9 @@ class LinkSerializer(serializers.ModelSerializer):
 class ImageCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Image
-        fields = ('id', 'name', 'image_field')
+        fields = (
+            'id', 'name', 'image_field', 'expiring_link_duration_seconds'
+        )
 
 
 class ImageSerializer(serializers.ModelSerializer):
