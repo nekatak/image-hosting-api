@@ -33,18 +33,33 @@ d. Validation
 e. Performance considerations (assume there can be a lot of images and
 the API is frequently accessed)
 
-Development
------------
+Development/Testing
+-------------------
 
 Tested with python 3.10.
+
+`docker`, `docker-compose` packages are needed to be installed before running any of the rest of commands for the development environment.
 
 All operations to run/execute the project are in the makefile.
 Running:
 ```
-make setup database test createsuperuser static-files run-server
+# this will give help for all the subcommands
+make
+
+# build local development docker image
+make setup
+# run db and apply migrations
+make database
+
+# run tests
+make test 
+
+# add super user for admin site, generate static files for django admin etc. and run dev server.
+make createsuperuser static-files run-server
 ```
-will start the server after running the unittests.
 
-Users to be created in the django-admin UI
+Users/Plans have to be created in the django-admin UI and each user needs to be assigned a plan.
+There are 3 predefined plans (Basic, Premium, Enterprise)
 
+Visit:
 http://localhost:8000/admin (credentials `admin`:`123`)

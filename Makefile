@@ -14,8 +14,11 @@ export PRINT_HELP_PYSCRIPT
 SHELL := /bin/bash
 PYTHON3 := $(shell which python3)
 PROJECT_ROOT=$(strip $(shell dirname $(realpath .)))
-ACTIVATE_VENV := . .venv/bin/activate
+IMAGE := images_api:dev
 DOCKER_COMPOSE=/usr/bin/docker-compose
+DOCKER=docker
+ACTIVATE_VENV := $(DOCKER) run --network host --rm -v `pwd`:/app -it $(IMAGE)
+POSTGRES_READY := $(DOCKER_COMPOSE) exec postgres pg_isready -U postgres
 
 
 help:
@@ -44,37 +47,35 @@ clean: clean-pyc clean-test clean-database ## Remove all generated artifacts and
 	rm -rf .venv
 
 
+setup: ## Setup development environment in docker. Needs to run before anything else.
+	$(DOCKER) build -f Dockerfile-dev -t $(IMAGE) .
+
+
 env:  ## Enter python virtualenv
-	$(ACTIVATE_VENV); $$SHELL
-
-
-setup: ## Setup virtualenv development environment. Needs to run before attempting to use a virtualenv.
-	sudo apt-get install -y python3-virtualenv docker.io docker-compose libpq-dev  # needed to build psycopg2
-	virtualenv .venv -p /usr/bin/python3
-	$(ACTIVATE_VENV); pip3 install -r requirements.txt
+	$(ACTIVATE_VENV) /bin/bash
 
 
 migration:  ## create migration scripts if models are changed.
-	$(ACTIVATE_VENV); python manage.py makemigrations
+	$(ACTIVATE_VENV) python manage.py makemigrations
 
 
 database: ## Start postgres db with docker and run migrations
 	$(DOCKER_COMPOSE) up -d postgres
-	sleep 5
-	$(ACTIVATE_VENV); python manage.py migrate
+	until $(POSTGRES_READY); do sleep 3; done
+	$(ACTIVATE_VENV) python manage.py migrate
 
 
 test:  ## Run test suite
-	$(ACTIVATE_VENV);  pytest -svv --disable-warnings
+	$(ACTIVATE_VENV) pytest -svv --disable-warnings
 
 
 run-server: ## Run backend & frontend server
-	$(ACTIVATE_VENV);  python manage.py runserver 0.0.0.0:8000
+	$(ACTIVATE_VENV) python manage.py runserver 0.0.0.0:8000
 
 
 createsuperuser:
-	$(ACTIVATE_VENV);  bash -c "DJANGO_SUPERUSER_USERNAME=admin DJANGO_SUPERUSER_PASSWORD=123 DJANGO_SUPERUSER_EMAIL=a@1.com python manage.py createsuperuser --no-input"
+	$(ACTIVATE_VENV) bash -c "DJANGO_SUPERUSER_USERNAME=admin DJANGO_SUPERUSER_PASSWORD=123 DJANGO_SUPERUSER_EMAIL=a@1.com python manage.py createsuperuser --no-input"
 
 
 static-files:
-	$(ACTIVATE_VENV); python manage.py collectstatic 
+	$(ACTIVATE_VENV) python manage.py collectstatic
