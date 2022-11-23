@@ -15,8 +15,8 @@ SHELL := /bin/bash
 PYTHON3 := $(shell which python3)
 PROJECT_ROOT=$(strip $(shell dirname $(realpath .)))
 IMAGE := images_api:dev
-DOCKER_COMPOSE=/usr/bin/docker-compose
-DOCKER=docker
+DOCKER_COMPOSE=sudo docker-compose
+DOCKER=sudo docker
 ACTIVATE_VENV := $(DOCKER) run --network host --rm -v `pwd`:/app -it $(IMAGE)
 POSTGRES_READY := $(DOCKER_COMPOSE) exec postgres pg_isready -U postgres
 
@@ -26,17 +26,17 @@ help:
 
 
 clean-test: ## Remove test and coverage artifacts
-	rm -fr .tox/
-	rm -f .coverage
-	rm -fr htmlcov/
-	rm -fr .pytest_cache
+	sudo rm -fr .tox/
+	sudo rm -f .coverage
+	sudo rm -fr htmlcov/
+	sudo rm -fr .pytest_cache
 
 
 clean-pyc: ## Remove Python file artifacts
-	find . -name '*.pyc' -exec rm -f {} +
-	find . -name '*.pyo' -exec rm -f {} +
-	find . -name '*~' -exec rm -f {} +
-	find . -name '__pycache__' -exec rm -fr {} +
+	sudo find . -name '*.pyc' -exec rm -f {} +
+	sudo find . -name '*.pyo' -exec rm -f {} +
+	sudo find . -name '*~' -exec rm -f {} +
+	sudo find . -name '__pycache__' -exec rm -fr {} +
 
 
 clean-database: ## drop database.
@@ -44,7 +44,7 @@ clean-database: ## drop database.
 
 
 clean: clean-pyc clean-test clean-database ## Remove all generated artifacts and drop DB
-	$(DOCKER) rmi $(IMAGE)
+	$(DOCKER) rmi $(IMAGE) || true
 
 
 setup: ## Setup development environment in docker. Needs to run before anything else.

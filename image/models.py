@@ -16,7 +16,7 @@ def image_path(instance, filename):
 
 
 def validate_expiring_link_duration_seconds(value):
-    if value and 300 <= value <= 30000:
+    if value and (value <= 300 or value >= 30000):
         raise ValidationError('Invalid expiring_link_duration_seconds value')
 
 
