@@ -194,3 +194,22 @@ class EnterprisePlanImageTestCase(BaseImageTestCase):
         expiry = datetime.strptime(link["expiry"], "%Y-%m-%dT%H:%M:%SZ")
 
         assert expiry == datetime.now() + timedelta(seconds=300)
+
+    @freeze_time("2013-01-14")
+    def test_images_api_get_expired_link(self):
+        resp = self.client.get(self.root_url)
+        assert resp.status_code == 200
+        content = json.loads(resp.content)
+
+        link = None
+        for item in content:
+            if item["id"] == str(self.obj.id):
+                assert len(item["links"]) == 4
+                for ln in item["links"]:
+                    if ln["expiry"]:
+                        link = ln
+
+        assert link
+
+        resp = self.client.get(link["uri"])
+        assert resp.status_code == 400
