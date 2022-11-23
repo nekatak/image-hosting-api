@@ -66,7 +66,7 @@ database: ## Start postgres db with docker and run migrations
 
 
 test:  ## Run test suite
-	$(ACTIVATE_VENV) pytest -svv --disable-warnings
+	$(ACTIVATE_VENV) pytest -svv --disable-warnings --cov=./plan --cov=./server --cov=./image
 
 
 run-server: ## Run backend & frontend server
