@@ -44,7 +44,7 @@ clean-database: ## drop database.
 
 
 clean: clean-pyc clean-test clean-database ## Remove all generated artifacts and drop DB
-	rm -rf .venv
+	$(DOCKER) rmi $(IMAGE)
 
 
 setup: ## Setup development environment in docker. Needs to run before anything else.

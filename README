@@ -36,9 +36,7 @@ the API is frequently accessed)
 Development/Testing
 -------------------
 
-Tested with python 3.10.
-
-`docker`, `docker-compose` packages are needed to be installed before running any of the rest of commands for the development environment.
+Assuming a linux dev environment: `docker`, `docker-compose`, `make` packages are needed to be installed before running any of the rest of commands for the development environment.
 
 All operations to run/execute the project are in the makefile.
 Running:
@@ -63,3 +61,41 @@ There are 3 predefined plans (Basic, Premium, Enterprise)
 
 Visit:
 http://localhost:8000/admin (credentials `admin`:`123`)
+
+After creating a user with a plan in order to get a token
+```
+curl --request POST \
+  --url http://localhost:8000/api/token/ \
+  --header 'Content-Type: application/json' \
+  --data '{
+	"username": "user1",
+	"password": "password"
+}'
+
+# {
+# 	"token": "ef6847c05d873734f9d9cdf3fbd02f571e23e6ba"
+# }
+```
+
+To upload an image:
+```
+curl --request POST \
+  --url 'http://localhost:8000/api/images/' \
+  --header 'Authorization: Token <token-from-previous-request>' \
+  --header 'Content-Type: multipart/form-data' \
+  --form name=last \
+  --form image_field=@/path/to/image/file
+```
+
+To list all images uploaded from user:
+```
+curl --request GET \
+  --url 'http://localhost:8000/api/images/' \
+  --header 'Authorization: Token <token-from-previous-request>'
+```
+
+To get the image back with one of links returned in the above response:
+```
+curl --request GET \
+  --url http://localhost:8000/api/images/links/b7db14c4-71d1-48ac-9d13-c1e91389023d
+```
